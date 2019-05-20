@@ -20,7 +20,7 @@ CREATE TABLE "user"
 (
   "user_id" SERIAL PRIMARY KEY,
   "username" varchar(50) NOT NULL,
-  "password" VARCHAR(50) NOT NULL,
+  "password" VARCHAR(250) NOT NULL,
   "user_role" VARCHAR (255) NOT NULL,
   "farm_registry_id" INT REFERENCES "farm_registry"
 );
@@ -202,7 +202,7 @@ VALUES
 
 -- "harvest_year"
 INSERT INTO "harvest_year"
-  ("havest_year", "farm_id")
+  ("harvest_year", "farm_id")
 VALUES
   ('2019-01-01', '1');
 
