@@ -28,7 +28,7 @@ import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
 import theme from './theme';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faRecycle, faCarrot, faTint, faPen, faPlus, faSeedling, faHome, faTractor, faClipboard, faUsers, faTable, faHorse, faIdCard, faVial, faSignOutAlt, faThermometerThreeQuarters, faTrashAlt, faMinusCircle } from '@fortawesome/free-solid-svg-icons';
+import { faRecycle, faCarrot, faTint, faPen, faPlus, faSeedling, faHome, faTractor, faClipboard, faUsers, faTable, faHorse, faIdCard, faVial, faSignOutAlt, faThermometerThreeQuarters, faTrashAlt, faMinusCircle, faUserEdit, faUserPlus, faFileExport } from '@fortawesome/free-solid-svg-icons';
 import './App.css';
 import ManageWorker from '../AdminComponents/ManageRoles/ManageWorker';
 
@@ -41,6 +41,7 @@ import WaterLogDashboard from '../AllUsersComponents/LogForms/SelectWaterLog/Sel
 import EmployeeLog from '../AllUsersComponents/LogForms/EmployeeTrainingLog/EmployeeTrainingLog';
 import EditCrops from '../AdminComponents/HarvestYear/EditHarvestYear/EditCrops/EditCrops';
 import EditEmployee from '../AdminComponents/ManageRoles/EditEmployee';
+import EditManure from '../AdminComponents/HarvestYear/EditHarvestYear/EditManureCompost/EditManureCompost';
 import EditWater from '../AdminComponents/HarvestYear/EditHarvestYear/EditWater/EditWater';
 import EditWorker from '../AdminComponents/ManageRoles/EditWorker';
 
@@ -62,8 +63,8 @@ import EditUser from '../AdminComponents/ManageRoles/EditUser';
 import ManageUserAccounts from '../SuperAdmin/ManageUserAccounts/ManageUserAccounts';
 import RecordHarvestDashboard from '../AllUsersComponents/Records/SelectHarvestRecord/SelectHarvestRecord';
 import RecordCropsFieldsLabelCode from '../AllUsersComponents/Records/CropsFieldsLabelCodeRecord/CropsFieldsLabelCodeRecord';
-
-library.add(faHome,faCarrot, faRecycle, faPen, faPlus, faSeedling, faTint, faTractor, faClipboard, faUsers, faTable, faHorse, faIdCard, faVial, faSignOutAlt, faThermometerThreeQuarters, faTrashAlt, faMinusCircle);
+import ExportDash from '../AllUsersComponents/Records/ExportPdf/ExportDash.js';
+library.add(faHome,faCarrot, faRecycle, faPen, faPlus, faSeedling, faTint, faTractor, faClipboard, faUsers, faTable, faHorse, faIdCard, faVial, faSignOutAlt, faThermometerThreeQuarters, faTrashAlt, faMinusCircle, faUserEdit, faUserPlus, faFileExport);
 
 class App extends Component {
   componentDidMount () {
@@ -145,6 +146,11 @@ class App extends Component {
               exact
               path="/editcrops"
               component={EditCrops}
+            />
+            <Route
+              exact
+              path="/editmanure"
+              component={EditManure}
             />
             <Route
               exact
@@ -337,12 +343,13 @@ class App extends Component {
             component={RecordCropsFieldsLabelCode}
             />
 
-            {/* <Route
+          <Route
             exact
-            path = '/manurelogdashboard' 
-            component={ManureLogDashboard}
-            /> */}
+            path='/exportdash'
+            component={ExportDash}
+          />
             
+          
 
               {/* If none of the other routes matched, we will show a 404. */}
               <Route render={() => <h1>404</h1>} />

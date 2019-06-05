@@ -19,19 +19,20 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import ListItemText from '@material-ui/core/ListItemText';
-import MenuItem from '@material-ui/core/MenuItem';
 import swal from 'sweetalert';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
+import { isMoment } from 'moment';
 
+const moment = require('moment');
 
-class LabelCodes extends Component {
+class Compost extends Component {
 
     state = {
         newLabel: {
-            crop_id: '',
-            field_id: '',
-            label_code: '',
+            name: '',
+            date: moment().format('YYYY-MM-DD'),
+            description: '',
         },
         dialogState: {
             array: '',
@@ -50,7 +51,7 @@ class LabelCodes extends Component {
                 [propertyName]: event.target.value,
             },
         })
-        if (this.state.newLabel.crop_id && this.state.newLabel.field_id && this.state.newLabel.label_code) {
+        if (this.state.newLabel.name && this.state.newLabel.description) {
             this.setState({
                 disable: false
             })
@@ -71,7 +72,7 @@ class LabelCodes extends Component {
                 }
             },
         })
-       /*  if (event.target.value === '') {
+        if (event.target.value === '') {
             this.setState({
                 disable: true
             })
@@ -80,44 +81,40 @@ class LabelCodes extends Component {
             this.setState({
                 disable: false
             })
-        } */
+        }
     }
 
     componentDidMount = () => {
-        this.props.dispatch({ type: 'GET_CROP_SOURCE' });
-        this.props.dispatch({ type: 'GET_FIELD_SOURCE' });
-        this.props.dispatch({ type: 'GET_LABEL_CODE' });
-        console.log('length is', this.state.checked.length);
-        
+        this.props.dispatch({ type: 'GET_COMPOST_SOURCE' });
+
     }
 
     addCropSource = (event) => {
         event.preventDefault();
-        this.props.dispatch({ type: 'ADD_LABEL_CODE', payload: this.state.newLabel })
+        this.props.dispatch({ type: 'ADD_COMPOST_EDIT', payload: this.state.newLabel })
         this.setState({
             newLabel: {
-                crop_id: '',
-                field_id: '',
-                label_code: '',
+                name: '',
+                date: moment().format('YYYY-MM-DD'),
+                description: '',
             },
         })
     }
 
     removeCropSource = () => {
         swal({
-            title: `Delete (${this.state.checked.length}) labels?`,
-            text: "These labels will be removed from your harvest year but will still appear in your records",
+            title: `Delete (${this.state.checked.length}) manure?`,
+            text: "These sources will be removed from your harvest year but will still appear in your records",
             icon: "warning",
             buttons: true,
             dangerMode: true,
         })
         .then((willDelete) => {
             if (willDelete) {
-                this.props.dispatch({ type: 'DISABLE_LABEL_CODE', payload: this.state })
-                this.props.dispatch({ type: 'GET_LABEL_CODE' });
+                this.props.dispatch({ type: 'DISABLE_COMPOST_SOURCE', payload: this.state })
+                this.props.dispatch({ type: 'GET_COMPOST_SOURCE' });
                 this.setState({
                     disableDelete: true
-                    
                 })
             }
         });
@@ -126,13 +123,11 @@ class LabelCodes extends Component {
     counter = () => {
         const count = this.state.checked.length;
         if(count > 0){
-            return `Disable LabelCodes (${count})`;
+            return `Disable Compost (${count})`;
         }else {
             return "nothing here"
 
         }
-        console.log('count is', count);
-        
     }
 
     handleCheck = value => () => {
@@ -143,7 +138,6 @@ class LabelCodes extends Component {
                 ...this.state.checked.push(value)
                 /* checked: [...this.state.checked, value] */,
                 disableDelete: false
-
             })
             
         } else {
@@ -170,12 +164,12 @@ class LabelCodes extends Component {
         this.setState({
             ...this.state,
             dialogState: {
-                array: this.props.reduxState.labelCode[i],
+                array: this.props.reduxState.setupCompost[i],
             },
             setOpen: true,
+            
         })
-        console.log('sate is', this.dialogState);
-        
+        console.log('sate is', this.state.dialogState);
     }
 
     handleClose = (event) => {
@@ -185,7 +179,7 @@ class LabelCodes extends Component {
 
             })
             swal("Changes Saved!", "", "success");
-            this.props.dispatch({ type: "EDIT_LABEL_CODE", payload: this.state.dialogState.array })
+            this.props.dispatch({ type: "EDIT_COMPOST_SOURCE", payload: this.state.dialogState.array })
             this.props.dispatch({ type: "GET_LABEL_CODE" })
             console.log('id is', this.state.dialogState);
 
@@ -210,57 +204,54 @@ class LabelCodes extends Component {
                     >
                     <Grid item xs={12} sm={6}>
                         <Typography variant="h6" gutterBottom align="center" className={classes.titleColor} align="center">
-                            Add or Edit LabelCodes
+                            Add or Edit Compost
                         </Typography>
                     </Grid>
 
-                    <Grid item xs={12} sm={6} >
+                    <Grid item xs={12}>
                         <FormControl>
                             <TextField
-                                label="Crop Name"
+                                label="Start Date"
                                 variant="outlined"
                                 color="primary"
-                                onChange={this.handleInputChangeFor('crop_id')}
-                                value={this.state.newLabel.crop_id}
+                                onChange={this.handleInputChangeFor('date')}
+                                type="date"
+                                value={this.state.newLabel.date}
+                                InputLabelProps={{
+                                    shrink: true,
+                                }}
                                 style={{ width: '80vw', maxWidth: 400 }}
-                                select
                             >
-                                {this.props.reduxState.cropSetup.cropSetup.map(crop=> (
-                                    <MenuItem key={crop.farm_crop_id} value={crop.farm_crop_id}>
-                                        {crop.farm_crop_type}
-                                    </MenuItem>
-                                ))}
-                            </TextField>
-                        </FormControl>
-                    </Grid>
-
-                    <Grid item xs={12} sm={6} >
-                        <FormControl>
-                            <TextField
-                                label="Field Name"
-                                variant="outlined"
-                                color="primary"
-                                onChange={this.handleInputChangeFor('field_id')}
-                                value={this.state.newLabel.field_id}
-                                style={{ width: '80vw', maxWidth: 400 }}
-                                select
-                            >
-                                {this.props.reduxState.cropSetup.fieldSetup.map(field => (
-                                    <MenuItem key={field.farm_field_id} value={field.farm_field_id}>
-                                        {field.field_name}
-                                    </MenuItem>
-                                ))}
                             </TextField>
                         </FormControl>
                     </Grid>
 
                     <Grid item xs={12} sm={6}>
-                        <TextField label="Label Code Name" variant="outlined" color="primary"
-                            onChange={this.handleInputChangeFor('label_code')}
-                            value={this.state.newLabel.label_code}
+                        <TextField
+                            label="Name Compost"
+                            variant="outlined"
+                            color="primary"
+                            onChange={this.handleInputChangeFor('name')}
+                            value={this.state.newLabel.name}
                             style={{ width: '80vw', maxWidth: 400, }}
                         >
                         </TextField>
+                    </Grid>
+
+                    <Grid item xs={12}>
+                        <FormControl>
+                            <TextField
+                                label="Describe Compost"
+                                variant="outlined"
+                                color="primary"
+                                onChange={this.handleInputChangeFor('description')}
+                                value={this.state.newLabel.description}
+                                multiline
+                                helperText='required'
+                                style={{ width: '80vw', maxWidth: 400 }}
+                            >
+                            </TextField>
+                        </FormControl>
                     </Grid>
 
                     <Grid item xs={12} sm={6}>
@@ -269,7 +260,7 @@ class LabelCodes extends Component {
                             disabled={this.state.disable}
                         >
                             <FontAwesomeIcon icon="plus" style={{ marginRight: 5, marginTop:-2, height: 10 }} className={classes.fabIconColor} />
-                            <Typography className={classes.fabColor}>Add Label</Typography>
+                            <Typography className={classes.fabColor}>Add Compost</Typography>
                         </Button>
                     </Grid>
 
@@ -280,38 +271,37 @@ class LabelCodes extends Component {
                                 aria-controls="panel1a-content"
                                 id="panel1a-header"    
                             >
-                                <Typography className={classes.heading}>My LabelCodes</Typography>
+                                <Typography className={classes.heading}>My Compost</Typography>
                             </ExpansionPanelSummary>
                             <ExpansionPanelDetails >
 
                                 <Grid item xs={12} sm={6}>
                                     <List style={{ marginLeft: -25, width: '70vw', maxWidth: 300 }}>
-                                        {this.props.reduxState.labelCode.map((code, i) =>
-                                        <section key={code.label_code_id}>
-                                            <ListItem key={code.label_code_id} 
+                                        {this.props.reduxState.setupCompost.map((compost, i) =>
+                                        <section key={compost.farm_compost_id}>
+                                                <ListItem key={compost.farm_compost_id} 
                                                 style={{ display: "flex", direction: "column", width: '70vw', maxWidth: 270 }}
-                                                onClick={this.handleCheck(code.label_code_id)}
+                                                    onClick={this.handleCheck(compost.farm_compost_id)}
                                             >
                                                 <ListItemIcon>
                                                     <Checkbox
                                                         edge="start"
-                                                        checked={this.state.checked.indexOf(code.label_code_id) !== -1}
-                                                        
+                                                        checked={this.state.checked.indexOf(compost.farm_compost_id) !== -1}
                                                         tabIndex={-1}
                                                         disableRipple
                                                     />
                                                 </ListItemIcon>
-                                                    <ListItemText primary={code.label_code_text} style={{ marginLeft: "-20px"}}/>
+                                                <ListItemText primary={compost.farm_compost_description+': '+ moment(compost.farm_compost_date).format('MM-DD')}
+                                                    style={{ marginLeft: "-20px"}}/>
                                                 <ListItemSecondaryAction>
                                                 <Button variant="outlined" color="primary" variant="contained"
                                                     onClick={event => this.handleClickOpen(i)} 
-                                                    value={code.label_code_text}
+                                                    value={compost.farm_compost_name}
                                                     style={{ width: '200', maxWidth: 270 }}
                                                 >
                                                     Edit
                                                 </Button>
                                                 </ListItemSecondaryAction>
-                        
                                             </ListItem>
                                             <Divider variant="middle" />
                                         </section>
@@ -322,11 +312,10 @@ class LabelCodes extends Component {
                                             disabled={this.state.disableDelete}
                                         >
                                             <FontAwesomeIcon icon="trash-alt" style={{ marginRight: 10, marginTop: -2  }} className={classes.fabIconColor} />
-                                            <Typography className={classes.fabColor}>Remove LabelCodes</Typography>
+                                            <Typography className={classes.fabColor}>Remove Compost</Typography>
                                         </Button>
                                     </List>
-                                </Grid>   
-
+                                </Grid>
                             </ExpansionPanelDetails>
                         </ExpansionPanel>
                     </Grid>
@@ -334,51 +323,55 @@ class LabelCodes extends Component {
                     <Grid item xs={12} sm={6}>
                         <Dialog open={this.state.setOpen} aria-labelledby="form-dialog-title">
                             <DialogContent style={{ width: '80vw', maxWidth: 200 }}>
+                                <FormControl>
+                                    <TextField
+                                        label="Application Date"
+                                        variant="outlined"
+                                        color="primary"
+                                        onChange={this.handleDialogChangeFor('farm_compost_date')}
+                                        type="date"
+                                        value={moment(this.state.dialogState.array.farm_compost_date).format('YYYY-MM-DD')}
+                                        style={{ marginRight: 10, marginBottom: 30, width: 180, }}
+                                        InputLabelProps={{
+                                            shrink: true,
+                                        }} 
+                                    >
+                                    </TextField>
+                                </FormControl>
                                 <TextField
-                                    label="Crop Name"
+                                    label="Name Compost"
                                     variant="outlined"
                                     color="primary"
-                                    value={this.state.dialogState.array.farm_crop_id}
-                                    onChange={this.handleDialogChangeFor('farm_crop_id')}
-                                    style={{marginRight: 10, marginBottom: 30, width: 180,}}
-                                    select
-                                >
-                                    {this.props.reduxState.cropSetup.cropSetup.map(crop => (
-                                        <MenuItem key={crop.farm_crop_id} value={crop.farm_crop_id}>
-                                            {crop.farm_crop_type}
-                                        </MenuItem>
-                                    ))}
-                                </TextField>
-                                <TextField
-                                    label="Field Name"
-                                    variant="outlined"
-                                    color="primary"
-                                    value={this.state.dialogState.array.farm_field_id}
-                                    onChange={this.handleDialogChangeFor('farm_field_id')}
+                                    onChange={this.handleDialogChangeFor('farm_compost_name')}
+                                    value={this.state.dialogState.array.farm_compost_name}
                                     style={{ marginRight: 10, marginBottom: 30, width: 180, }}
-                                    select
                                 >
-                                    {this.props.reduxState.cropSetup.fieldSetup.map(field => (
-                                        <MenuItem key={field.farm_field_id} value={field.farm_field_id}>
-                                            {field.field_name}
-                                        </MenuItem>
-                                    ))}
                                 </TextField>
                                 <TextField
-                                    autoFocus
-                                    margin="dense"
-                                    id="name"
-                                    label={"Label Name"}
-                                    value={this.state.dialogState.array.label_code_text}
-                                    onChange={this.handleDialogChangeFor('label_code_text')}
-                                    fullWidth
-                                />
+                                    label="Describe Compost"
+                                    variant="outlined"
+                                    color="primary"
+                                    onChange={this.handleDialogChangeFor('farm_compost_description')}
+                                    value={this.state.dialogState.array.farm_compost_description}
+                                    style={{ marginRight: 10, marginBottom: 20, width: 180, }}
+                                    multiline
+                                    helperText='required'  
+                                >
+                                </TextField>
                             </DialogContent>
                             <DialogActions>
-                                <Button onClick={this.handleClose} value={1} color="primary" variant="contained">
+                                <Button 
+                                    onClick={this.handleClose} 
+                                    value={1} 
+                                    color="primary" 
+                                    variant="contained">
                                     Cancel
                                 </Button>
-                                <Button onClick={this.handleClose} value={"update"} color="primary" variant="contained">
+                                <Button 
+                                    onClick={this.handleClose} 
+                                    value={"update"} 
+                                    color="primary" 
+                                    variant="contained">
                                     Update
                                 </Button>
                             </DialogActions>
@@ -406,4 +399,4 @@ const mapReduxStateToProps = (reduxState) => ({
     reduxState,
 });
 
-export default connect(mapReduxStateToProps)(withStyles(styles)(LabelCodes));
+export default connect(mapReduxStateToProps)(withStyles(styles)(Compost));

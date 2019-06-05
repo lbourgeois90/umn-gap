@@ -49,14 +49,14 @@ class WaterLabels extends Component {
                 [propertyName]: event.target.value,
             },
         })
-        if (event.target.value === '') {
+        if (this.state.newLabel.water_id && this.state.newLabel.label_code) {
             this.setState({
-                disable: true
+                disable: false
             })
 
         } else {
             this.setState({
-                disable: false
+                disable: true
             })
         }
     }
@@ -290,8 +290,7 @@ class WaterLabels extends Component {
                                                         disableRipple
                                                     />
                                                 </ListItemIcon>
-                                                    <ListItemText primary={label.farm_water_source_name} style={{ marginLeft: "-20px"}}/>
-                                                    <ListItemText primary={label.label_code_text} style={{ marginLeft: "-40px" }} />
+                                                    <ListItemText primary={label.farm_water_source_name+ ': '+label.label_code_text} style={{ marginLeft: "-20px"}}/>  
                                                 <ListItemSecondaryAction>
                                                 <Button variant="outlined" color="primary" variant="contained"
                                                     onClick={event => this.handleClickOpen(i)} 
@@ -312,7 +311,7 @@ class WaterLabels extends Component {
                                             disabled={this.state.disableDelete}
                                         >
                                             <FontAwesomeIcon icon="trash-alt" style={{ marginRight: 10, marginTop: -2  }} className={classes.fabIconColor} />
-                                            <Typography className={classes.fabColor}>Remove Water Labels</Typography>
+                                            <Typography className={classes.fabColor}>Remove Manure</Typography>
                                         </Button>
                                     </List>
                                 </Grid>   
